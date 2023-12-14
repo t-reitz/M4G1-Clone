@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Connect</title>
+  <link rel="stylesheet" href="static/pesquisa.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+</head>
+<body>
+  <h1>O que você está procurando?</h1>
+  <form id="searchForm">
+    <button type="submit" id="icone" class="bi bi-search" style="background-color: transparent; border: none;"></button>
+    <input placeholder="Pesquise ativos, ferramentas, palavras-chaves..." type="text" id="idInput" name="sn_bar_code" required>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const snBarCode = formData.get('sn_bar_code');
+
+      const response = await fetch('/pesquisar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sn_bar_code: snBarCode })
+      });
+
+      const data = await response.json();
+
+      if (data) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<p><a id="nome_ativo">${data.ne_name}<a> <br> <br>
+          SN_BAR_CODE: ${data.sn_bar_code} <br>
+          Endereço: ${data.ne_adress} <br>
+          UF: ${data.uf}, Cidade: ${data.cidade} <br>
+          Nome Placa: ${data.board_name}, Nome Completo Placa: ${data.board_full_name} <br>
+          Tipo de Placa: ${data.board_type}, Tipo MPU: ${data.ne_type_mpu_type} <br>
+          Código BOM: ${data.pn_bom_code}<br>
+          Descrição: ${data.description} <br>
+          Preço(USD): ${data.list_price_usd}, Preço(R$): ${data.preco_real} <br>
+          Processo Compra: ${data.processo_compra}, Projeto: ${data.projeto} <br>
+          Fim da Garantia: ${data.fim_garantia}, Número do Contrato: ${data.num_contrato} <br>
+          Inicio do Contrato: ${data.inicio_contrato}, Fim do Contrato: ${data.fim_contrato} </p>`;
+      } else {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<p>SN_BAR_CODE não encontrado.</p>`;
+      }
+
+      
+
+    });
+  </script>
+</body>
+</html>
